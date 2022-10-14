@@ -7,23 +7,21 @@ import lesson5.utils.RetrofitUtils;
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import retrofit2.Response;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
-public class CreateProductTest {
+public class CreateProductTest extends BaseTest {
 
     static ProductService productService;
     Product product = null;
     Faker faker = new Faker();
-    int id;
+
 
     @BeforeAll
     static void beforeAll() {
@@ -40,19 +38,22 @@ public class CreateProductTest {
     }
 
     @Test
+    @Order(1)
     void createProductInFoodCategoryTest() throws IOException {
         Response<Product> response = productService.createProduct(product)
                 .execute();
-        id =  response.body().getId();
+        setNewId(response.body().getId().toString());
         assertThat(response.isSuccessful(), CoreMatchers.is(true));
+    }
+    @Test
+    @Order(2)
+    void requestCreadtedProductWithIdTest() throws IOException {
+        Response<Product> response = productService.getProductById(getNewId()).execute();
+        assertThat(response.isSuccessful(), CoreMatchers.is(true));
+
     }
 
-    @SneakyThrows
-    @AfterEach
-    void tearDown() {
-        Response<ResponseBody> response = productService.deleteProduct(id).execute();
-        assertThat(response.isSuccessful(), CoreMatchers.is(true));
-    }
+
 
 
 
